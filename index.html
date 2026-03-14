@@ -56,6 +56,7 @@
       border: 1px solid var(--border);
       box-shadow: var(--shadow);
       backdrop-filter: blur(16px);
+      transition: border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
     }
 
     .discord-header::before {
@@ -64,6 +65,37 @@
       inset: 0;
       background:
         linear-gradient(90deg, rgba(88, 101, 242, 0.14), transparent 38%, rgba(124, 58, 237, 0.12));
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+
+    .discord-header.is-online {
+      border-color: rgba(34, 197, 94, 0.22);
+      box-shadow:
+        var(--shadow),
+        0 0 32px rgba(34, 197, 94, 0.08);
+    }
+
+    .discord-header.is-online::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, rgba(34, 197, 94, 0.08), transparent 45%);
+      pointer-events: none;
+    }
+
+    .discord-header.is-offline {
+      border-color: rgba(239, 68, 68, 0.22);
+      box-shadow:
+        var(--shadow),
+        0 0 32px rgba(239, 68, 68, 0.08);
+    }
+
+    .discord-header.is-offline::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, rgba(239, 68, 68, 0.08), transparent 45%);
       pointer-events: none;
     }
 
@@ -165,6 +197,7 @@
       box-shadow: var(--shadow);
       backdrop-filter: blur(16px);
       margin-bottom: 28px;
+      transition: border-color 0.25s ease, box-shadow 0.25s ease;
     }
 
     .hero::before {
@@ -174,6 +207,32 @@
       background:
         linear-gradient(90deg, rgba(34, 197, 94, 0.08), transparent 40%, rgba(124, 58, 237, 0.08));
       pointer-events: none;
+      opacity: 0.75;
+      transition: opacity 0.25s ease, background 0.25s ease;
+    }
+
+    .hero.server-online-theme {
+      border-color: rgba(34, 197, 94, 0.24);
+      box-shadow:
+        var(--shadow),
+        0 0 35px rgba(34, 197, 94, 0.08);
+    }
+
+    .hero.server-online-theme::before {
+      background: linear-gradient(90deg, rgba(34, 197, 94, 0.14), transparent 45%, rgba(124, 58, 237, 0.06));
+      opacity: 1;
+    }
+
+    .hero.server-offline-theme {
+      border-color: rgba(239, 68, 68, 0.24);
+      box-shadow:
+        var(--shadow),
+        0 0 35px rgba(239, 68, 68, 0.08);
+    }
+
+    .hero.server-offline-theme::before {
+      background: linear-gradient(90deg, rgba(239, 68, 68, 0.12), transparent 45%, rgba(124, 58, 237, 0.04));
+      opacity: 1;
     }
 
     .hero-top {
@@ -544,7 +603,7 @@
 <body>
   <div class="container">
 
-    <section class="discord-header">
+    <section id="discordHeader" class="discord-header is-offline">
       <div class="discord-header-left">
         <img
           class="guild-icon"
@@ -571,12 +630,12 @@
         </div>
         <div class="mini-stat">
           <div class="mini-stat-label">System</div>
-          <div class="mini-stat-value">Live Monitoring aktiv</div>
+          <div id="headerSystemState" class="mini-stat-value">Wird geladen ...</div>
         </div>
       </div>
     </section>
 
-    <section class="hero">
+    <section id="heroSection" class="hero server-offline-theme">
       <div class="hero-top">
         <div>
           <h2 class="title">Felilu Netzwerk Status</h2>
@@ -601,8 +660,8 @@
         </div>
 
         <div class="stat-card">
-          <div class="stat-label">Letztes Signal</div>
-          <div id="serverUpdatedAt" class="stat-value">—</div>
+          <div class="stat-label">Uptime</div>
+          <div id="serverUptime" class="stat-value">—</div>
         </div>
 
         <div class="stat-card">
@@ -615,7 +674,7 @@
     <h2 class="section-title">Discord Bots</h2>
     <section id="botGrid" class="bot-grid"></section>
 
-    <div id="footerText" class="footer">Aktualisiere Status ...</div>
+    <div class="footer">Statusseite aktiv</div>
   </div>
 
   <script>
@@ -627,8 +686,7 @@
       description: "Übersicht über Systemstatus, Discord-Bots und Wartungszustände.",
       icon: "https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=300&q=80",
       badge: "Discord Status",
-      miniLeft: "10 Bots verbunden",
-      miniRight: "Live Monitoring aktiv"
+      miniLeft: "10 Bots verbunden"
     };
 
     const bots = [
@@ -704,13 +762,15 @@
       }
     ];
 
+    let onlineSince = null;
+    let currentServerOnline = false;
+
     function applyHeader() {
       document.querySelector(".guild-title").textContent = serverHeader.name;
       document.querySelector(".guild-desc").textContent = serverHeader.description;
       document.querySelector(".guild-badge").textContent = serverHeader.badge;
       document.getElementById("guildIcon").src = serverHeader.icon;
       document.querySelectorAll(".mini-stat-value")[0].textContent = serverHeader.miniLeft;
-      document.querySelectorAll(".mini-stat-value")[1].textContent = serverHeader.miniRight;
     }
 
     function getStatusMeta(status) {
@@ -738,6 +798,54 @@
         glowClass: "offline-glow",
         dotClass: "offline"
       };
+    }
+
+    function formatDuration(ms) {
+      if (!ms || ms < 0) return "Gerade eben";
+
+      const totalSeconds = Math.floor(ms / 1000);
+      const days = Math.floor(totalSeconds / 86400);
+      const hours = Math.floor((totalSeconds % 86400) / 3600);
+      const minutes = Math.floor((totalSeconds % 3600) / 60);
+
+      if (days > 0) {
+        return `${days} Tag${days !== 1 ? "e" : ""} ${hours} Std`;
+      }
+
+      if (hours > 0) {
+        return `${hours} Std ${minutes} Min`;
+      }
+
+      if (minutes > 0) {
+        return `${minutes} Min`;
+      }
+
+      return "Unter 1 Minute";
+    }
+
+    function updateTheme(serverOnline) {
+      const header = document.getElementById("discordHeader");
+      const hero = document.getElementById("heroSection");
+      const systemState = document.getElementById("headerSystemState");
+
+      header.classList.toggle("is-online", serverOnline);
+      header.classList.toggle("is-offline", !serverOnline);
+
+      hero.classList.toggle("server-online-theme", serverOnline);
+      hero.classList.toggle("server-offline-theme", !serverOnline);
+
+      systemState.textContent = serverOnline ? "Server stabil online" : "Server aktuell offline";
+    }
+
+    function updateUptimeDisplay() {
+      const uptimeEl = document.getElementById("serverUptime");
+
+      if (!currentServerOnline || !onlineSince) {
+        uptimeEl.textContent = "Offline";
+        return;
+      }
+
+      uptimeEl.textContent = formatDuration(Date.now() - onlineSince);
     }
 
     function renderBots(serverOnline) {
@@ -794,31 +902,40 @@
         const tooOld = !updatedAt || (Date.now() - updatedAt.getTime() > OFFLINE_AFTER_MS);
         const serverOnline = Boolean(data.online) && !tooOld;
 
+        if (serverOnline && !currentServerOnline) {
+          onlineSince = Date.now();
+        }
+
+        if (!serverOnline) {
+          onlineSince = null;
+        }
+
+        currentServerOnline = serverOnline;
+
         const serverBadge = document.getElementById("serverBadge");
         const serverBadgeText = document.getElementById("serverBadgeText");
         const serverStatusText = document.getElementById("serverStatusText");
         const serverMessage = document.getElementById("serverMessage");
-        const serverUpdatedAt = document.getElementById("serverUpdatedAt");
-        const footerText = document.getElementById("footerText");
 
         serverBadge.className = `server-badge ${serverOnline ? "server-online" : "server-offline"}`;
         serverBadgeText.textContent = serverOnline ? "SERVER ONLINE" : "SERVER OFFLINE";
         serverStatusText.textContent = serverOnline ? "ONLINE" : "OFFLINE";
         serverMessage.textContent = data.message || "Keine Nachricht";
-        serverUpdatedAt.textContent = updatedAt
-          ? updatedAt.toLocaleString("de-DE", { dateStyle: "medium", timeStyle: "medium" })
-          : "Noch nie";
-        footerText.textContent = `Letzte Prüfung: ${new Date().toLocaleString("de-DE")}`;
 
+        updateTheme(serverOnline);
+        updateUptimeDisplay();
         renderBots(serverOnline);
       } catch (err) {
+        currentServerOnline = false;
+        onlineSince = null;
+
         document.getElementById("serverBadge").className = "server-badge server-offline";
         document.getElementById("serverBadgeText").textContent = "SERVER OFFLINE";
         document.getElementById("serverStatusText").textContent = "OFFLINE";
         document.getElementById("serverMessage").textContent = "Fehler beim Laden";
-        document.getElementById("serverUpdatedAt").textContent = "—";
-        document.getElementById("footerText").textContent = err.message;
 
+        updateTheme(false);
+        updateUptimeDisplay();
         renderBots(false);
       }
     }
@@ -826,6 +943,7 @@
     applyHeader();
     loadStatus();
     setInterval(loadStatus, 30000);
+    setInterval(updateUptimeDisplay, 1000);
   </script>
 </body>
 </html>
