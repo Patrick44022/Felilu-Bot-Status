@@ -1,500 +1,257 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Felilu Bot Status</title>
-  <style>
-    :root {
-      color-scheme: dark;
-      --bg-1: #0b1020;
-      --bg-2: #111827;
-      --card: rgba(17, 24, 39, 0.88);
-      --border: rgba(255, 255, 255, 0.08);
-      --text: #f3f4f6;
-      --muted: #9ca3af;
-      --online: #22c55e;
-      --offline: #ef4444;
-      --maintenance: #f59e0b;
-      --shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Felilu Bot Status</title>
 
-    * {
-      box-sizing: border-box;
-    }
+<style>
 
-    body {
-      margin: 0;
-      min-height: 100vh;
-      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      color: var(--text);
-      background:
-        radial-gradient(circle at top left, #1d4ed8 0%, transparent 28%),
-        radial-gradient(circle at top right, #7c3aed 0%, transparent 25%),
-        linear-gradient(135deg, var(--bg-1), var(--bg-2));
-      padding: 32px 20px 60px;
-    }
+body{
+    margin:0;
+    font-family:Arial,Helvetica,sans-serif;
+    background:#0f172a;
+    color:white;
+}
 
-    .container {
-      max-width: 1300px;
-      margin: 0 auto;
-    }
+.container{
+    max-width:1200px;
+    margin:auto;
+    padding:40px 20px;
+}
 
-    .hero {
-      position: relative;
-      overflow: hidden;
-      background: rgba(15, 23, 42, 0.72);
-      border: 1px solid var(--border);
-      border-radius: 28px;
-      padding: 32px;
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(16px);
-      margin-bottom: 28px;
-    }
+.serverStatus{
+    text-align:center;
+    font-size:40px;
+    font-weight:bold;
+    margin-bottom:40px;
+}
 
-    .hero::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background:
-        linear-gradient(90deg, rgba(34, 197, 94, 0.08), transparent 40%, rgba(124, 58, 237, 0.08));
-      pointer-events: none;
-    }
+.serverOnline{
+    color:#22c55e;
+    text-shadow:0 0 20px #22c55e;
+}
 
-    .hero-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 16px;
-      flex-wrap: wrap;
-    }
+.serverOffline{
+    color:#ef4444;
+    text-shadow:0 0 20px #ef4444;
+}
 
-    .title {
-      margin: 0;
-      font-size: clamp(2rem, 4vw, 3.4rem);
-      line-height: 1;
-      font-weight: 800;
-      letter-spacing: -0.03em;
-    }
+.botGrid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+    gap:25px;
+}
 
-    .subtitle {
-      margin: 10px 0 0;
-      color: var(--muted);
-      font-size: 1rem;
-    }
+.botCard{
+    background:#111827;
+    border-radius:20px;
+    padding:20px;
+    position:relative;
+    transition:0.3s;
+}
 
-    .server-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 12px;
-      padding: 14px 20px;
-      border-radius: 999px;
-      font-weight: 800;
-      font-size: 1rem;
-      border: 1px solid var(--border);
-      background: rgba(255, 255, 255, 0.04);
-      white-space: nowrap;
-    }
+.botCard:hover{
+    transform:translateY(-5px);
+}
 
-    .status-dot {
-      width: 13px;
-      height: 13px;
-      border-radius: 50%;
-      flex: 0 0 auto;
-    }
+.botTop{
+    display:flex;
+    align-items:center;
+    gap:15px;
+}
 
-    .server-online .status-dot {
-      background: var(--online);
-      box-shadow: 0 0 18px rgba(34, 197, 94, 0.9);
-    }
+.avatar{
+    width:60px;
+    height:60px;
+    border-radius:50%;
+    position:relative;
+}
 
-    .server-offline .status-dot {
-      background: var(--offline);
-      box-shadow: 0 0 18px rgba(239, 68, 68, 0.9);
-    }
+.avatar img{
+    width:60px;
+    height:60px;
+    border-radius:50%;
+}
 
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 16px;
-      margin-top: 26px;
-    }
+.statusDot{
+    width:14px;
+    height:14px;
+    border-radius:50%;
+    position:absolute;
+    bottom:0;
+    right:0;
+    border:3px solid #111827;
+}
 
-    .stat-card {
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 18px;
-    }
+.online{
+    background:#22c55e;
+    box-shadow:0 0 12px #22c55e;
+}
 
-    .stat-label {
-      color: var(--muted);
-      font-size: 0.9rem;
-      margin-bottom: 8px;
-    }
+.offline{
+    background:#ef4444;
+    box-shadow:0 0 12px #ef4444;
+}
 
-    .stat-value {
-      font-size: 1.1rem;
-      font-weight: 700;
-      word-break: break-word;
-    }
+.maintenance{
+    background:#f59e0b;
+    box-shadow:0 0 12px #f59e0b;
+}
 
-    .section-title {
-      margin: 34px 0 18px;
-      font-size: 1.4rem;
-      font-weight: 800;
-      letter-spacing: -0.02em;
-    }
+.botName{
+    font-weight:bold;
+    font-size:18px;
+}
 
-    .bot-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 18px;
-    }
+.botTag{
+    color:#9ca3af;
+    font-size:14px;
+}
 
-    .bot-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 24px;
-      padding: 18px;
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(12px);
-      transition: transform 0.18s ease, border-color 0.18s ease;
-    }
+.botBadge{
+    margin-top:12px;
+    display:inline-block;
+    padding:6px 12px;
+    border-radius:999px;
+    font-size:13px;
+    font-weight:bold;
+}
 
-    .bot-card:hover {
-      transform: translateY(-4px);
-      border-color: rgba(255, 255, 255, 0.16);
-    }
+.badgeOnline{
+    background:#14532d;
+    color:#4ade80;
+}
 
-    .bot-top {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
+.badgeOffline{
+    background:#7f1d1d;
+    color:#f87171;
+}
 
-    .bot-avatar-wrap {
-      position: relative;
-      width: 62px;
-      height: 62px;
-      flex: 0 0 auto;
-    }
+.badgeMaintenance{
+    background:#78350f;
+    color:#fbbf24;
+}
 
-    .bot-avatar {
-      width: 62px;
-      height: 62px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 2px solid rgba(255, 255, 255, 0.12);
-      background: #0f172a;
-    }
-
-    .bot-presence {
-      position: absolute;
-      right: 0;
-      bottom: 0;
-      width: 16px;
-      height: 16px;
-      border-radius: 50%;
-      border: 3px solid #111827;
-    }
-
-    .presence-online {
-      background: var(--online);
-    }
-
-    .presence-offline {
-      background: var(--offline);
-    }
-
-    .presence-maintenance {
-      background: var(--maintenance);
-    }
-
-    .bot-name {
-      font-size: 1.08rem;
-      font-weight: 800;
-      margin: 0;
-    }
-
-    .bot-tag {
-      color: var(--muted);
-      font-size: 0.92rem;
-      margin-top: 4px;
-    }
-
-    .bot-status {
-      margin-top: 16px;
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      padding: 10px 14px;
-      border-radius: 999px;
-      font-size: 0.92rem;
-      font-weight: 700;
-      border: 1px solid var(--border);
-      background: rgba(255, 255, 255, 0.04);
-    }
-
-    .bot-desc {
-      margin-top: 14px;
-      color: var(--muted);
-      font-size: 0.94rem;
-      line-height: 1.5;
-      min-height: 42px;
-    }
-
-    .footer {
-      margin-top: 28px;
-      color: var(--muted);
-      font-size: 0.92rem;
-      text-align: center;
-    }
-
-    @media (max-width: 900px) {
-      .stats {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-    }
-
-    @media (max-width: 560px) {
-      .stats {
-        grid-template-columns: 1fr;
-      }
-
-      .hero {
-        padding: 22px;
-      }
-    }
-  </style>
+</style>
 </head>
+
 <body>
-  <div class="container">
-    <section class="hero">
-      <div class="hero-top">
-        <div>
-          <h1 class="title">Felilu Netzwerk Status</h1>
-          <p class="subtitle">Live-Übersicht über Server und Discord-Bots</p>
-        </div>
 
-        <div id="serverBadge" class="server-badge server-offline">
-          <span class="status-dot"></span>
-          <span id="serverBadgeText">SERVER WIRD GELADEN ...</span>
-        </div>
-      </div>
+<div class="container">
 
-      <div class="stats">
-        <div class="stat-card">
-          <div class="stat-label">Server Status</div>
-          <div id="serverStatusText" class="stat-value">Lade ...</div>
-        </div>
+<div id="serverStatus" class="serverStatus">Server wird geladen...</div>
 
-        <div class="stat-card">
-          <div class="stat-label">Nachricht</div>
-          <div id="serverMessage" class="stat-value">—</div>
-        </div>
+<div id="botGrid" class="botGrid"></div>
 
-        <div class="stat-card">
-          <div class="stat-label">Letztes Signal</div>
-          <div id="serverUpdatedAt" class="stat-value">—</div>
-        </div>
+</div>
 
-        <div class="stat-card">
-          <div class="stat-label">Bots online</div>
-          <div id="botCounter" class="stat-value">0 / 10</div>
-        </div>
-      </div>
-    </section>
+<script>
 
-    <h2 class="section-title">Discord Bots</h2>
-    <section id="botGrid" class="bot-grid"></section>
+const STATUS_URL="./status.json";
+const OFFLINE_AFTER=3*60*1000;
 
-    <div id="footerText" class="footer">Aktualisiere Status ...</div>
-  </div>
+const bots=[
+{name:"Felilu Guard",tag:"#1001",status:"online",avatar:"https://cdn.discordapp.com/embed/avatars/0.png"},
+{name:"Felilu Music",tag:"#1002",status:"online",avatar:"https://cdn.discordapp.com/embed/avatars/1.png"},
+{name:"Felilu Tickets",tag:"#1003",status:"maintenance",avatar:"https://cdn.discordapp.com/embed/avatars/2.png"},
+{name:"Felilu Logs",tag:"#1004",status:"online",avatar:"https://cdn.discordapp.com/embed/avatars/3.png"},
+{name:"Felilu Verify",tag:"#1005",status:"online",avatar:"https://cdn.discordapp.com/embed/avatars/4.png"},
+{name:"Felilu AI",tag:"#1006",status:"offline",avatar:"https://cdn.discordapp.com/embed/avatars/5.png"},
+{name:"Felilu Stats",tag:"#1007",status:"online",avatar:"https://cdn.discordapp.com/embed/avatars/0.png"},
+{name:"Felilu Welcome",tag:"#1008",status:"maintenance",avatar:"https://cdn.discordapp.com/embed/avatars/1.png"},
+{name:"Felilu Backup",tag:"#1009",status:"online",avatar:"https://cdn.discordapp.com/embed/avatars/2.png"},
+{name:"Felilu Notify",tag:"#1010",status:"online",avatar:"https://cdn.discordapp.com/embed/avatars/3.png"}
+];
 
-  <script>
-    const STATUS_URL = "./status.json";
-    const OFFLINE_AFTER_MS = 3 * 60 * 1000;
+function renderBots(serverOnline){
 
-    // Hier kannst du deine 10 Fake-Bots bearbeiten
-    // status erlaubt: "online", "offline", "maintenance"
-    const bots = [
-      {
-        name: "Felilu Guard",
-        tag: "@felilu-guard",
-        status: "online",
-        description: "Schützt den Server und kümmert sich um Moderation.",
-        avatar: "https://cdn.discordapp.com/embed/avatars/0.png"
-      },
-      {
-        name: "Felilu Music",
-        tag: "@felilu-music",
-        status: "online",
-        description: "Spielt Musik, verwaltet Warteschlangen und Commands.",
-        avatar: "https://cdn.discordapp.com/embed/avatars/1.png"
-      },
-      {
-        name: "Felilu Tickets",
-        tag: "@felilu-tickets",
-        status: "maintenance",
-        description: "Bearbeitet Support-Tickets und private Anfragen.",
-        avatar: "https://cdn.discordapp.com/embed/avatars/2.png"
-      },
-      {
-        name: "Felilu Logs",
-        tag: "@felilu-logs",
-        status: "online",
-        description: "Speichert Audit-Logs und Statusmeldungen.",
-        avatar: "https://cdn.discordapp.com/embed/avatars/3.png"
-      },
-      {
-        name: "Felilu Verify",
-        tag: "@felilu-verify",
-        status: "online",
-        description: "Übernimmt Verifizierung und Rollenzuweisung.",
-        avatar: "https://cdn.discordapp.com/embed/avatars/4.png"
-      },
-      {
-        name: "Felilu AI",
-        tag: "@felilu-ai",
-        status: "offline",
-        description: "Antwortet auf Fragen und hilft im Community-Chat.",
-        avatar: "https://cdn.discordapp.com/embed/avatars/5.png"
-      },
-      {
-        name: "Felilu Stats",
-        tag: "@felilu-stats",
-        status: "online",
-        description: "Erstellt Statistiken und Aktivitätsübersichten.",
-        avatar: "https://cdn.discordapp.com/embed/avatars/0.png"
-      },
-      {
-        name: "Felilu Welcome",
-        tag: "@felilu-welcome",
-        status: "maintenance",
-        description: "Begrüßt neue Mitglieder und verschickt Hinweise.",
-        avatar: "https://cdn.discordapp.com/embed/avatars/1.png"
-      },
-      {
-        name: "Felilu Backup",
-        tag: "@felilu-backup",
-        status: "online",
-        description: "Verwaltet Sicherungen und automatische Tasks.",
-        avatar: "https://cdn.discordapp.com/embed/avatars/2.png"
-      },
-      {
-        name: "Felilu Notify",
-        tag: "@felilu-notify",
-        status: "online",
-        description: "Schickt News, Alerts und System-Benachrichtigungen.",
-        avatar: "https://cdn.discordapp.com/embed/avatars/3.png"
-      }
-    ];
+const grid=document.getElementById("botGrid");
+grid.innerHTML="";
 
-    function getStatusMeta(status) {
-      if (status === "online") {
-        return {
-          label: "Online",
-          presenceClass: "presence-online"
-        };
-      }
+bots.forEach(bot=>{
 
-      if (status === "maintenance") {
-        return {
-          label: "Wartungsarbeiten",
-          presenceClass: "presence-maintenance"
-        };
-      }
+let status=serverOnline?bot.status:"offline";
 
-      return {
-        label: "Offline",
-        presenceClass: "presence-offline"
-      };
-    }
+let badge="badgeOnline";
+let dot="online";
+let label="ONLINE";
 
-    function renderBots(serverOnline) {
-      const botGrid = document.getElementById("botGrid");
-      botGrid.innerHTML = "";
+if(status==="offline"){
+badge="badgeOffline";
+dot="offline";
+label="OFFLINE";
+}
 
-      let onlineCount = 0;
+if(status==="maintenance"){
+badge="badgeMaintenance";
+dot="maintenance";
+label="WARTUNG";
+}
 
-      bots.forEach((bot) => {
-        const effectiveStatus = serverOnline ? bot.status : "offline";
-        if (effectiveStatus === "online") onlineCount++;
+grid.innerHTML+=`
+<div class="botCard">
 
-        const meta = getStatusMeta(effectiveStatus);
+<div class="botTop">
 
-        const card = document.createElement("article");
-        card.className = "bot-card";
+<div class="avatar">
+<img src="${bot.avatar}">
+<div class="statusDot ${dot}"></div>
+</div>
 
-        card.innerHTML = `
-          <div class="bot-top">
-            <div class="bot-avatar-wrap">
-              <img class="bot-avatar" src="${bot.avatar}" alt="${bot.name}">
-              <span class="bot-presence ${meta.presenceClass}"></span>
-            </div>
-            <div>
-              <h3 class="bot-name">${bot.name}</h3>
-              <div class="bot-tag">${bot.tag}</div>
-            </div>
-          </div>
+<div>
+<div class="botName">${bot.name}</div>
+<div class="botTag">${bot.tag}</div>
+</div>
 
-          <div class="bot-status">
-            <span class="status-dot ${meta.presenceClass.replace("presence-", "")}"></span>
-            <span>${meta.label}</span>
-          </div>
+</div>
 
-          <div class="bot-desc">${bot.description}</div>
-        `;
+<div class="botBadge ${badge}">${label}</div>
 
-        botGrid.appendChild(card);
-      });
+</div>
+`;
 
-      document.getElementById("botCounter").textContent = `${onlineCount} / ${bots.length}`;
-    }
+});
 
-    async function loadStatus() {
-      try {
-        const res = await fetch(STATUS_URL + "?t=" + Date.now(), { cache: "no-store" });
-        if (!res.ok) throw new Error("status.json konnte nicht geladen werden");
+}
 
-        const data = await res.json();
+async function loadStatus(){
 
-        const updatedAt = data.updatedAt ? new Date(data.updatedAt) : null;
-        const tooOld = !updatedAt || (Date.now() - updatedAt.getTime() > OFFLINE_AFTER_MS);
-        const serverOnline = Boolean(data.online) && !tooOld;
+try{
 
-        const serverBadge = document.getElementById("serverBadge");
-        const serverBadgeText = document.getElementById("serverBadgeText");
-        const serverStatusText = document.getElementById("serverStatusText");
-        const serverMessage = document.getElementById("serverMessage");
-        const serverUpdatedAt = document.getElementById("serverUpdatedAt");
-        const footerText = document.getElementById("footerText");
+const res=await fetch(STATUS_URL+"?"+Date.now());
+const data=await res.json();
 
-        serverBadge.className = `server-badge ${serverOnline ? "server-online" : "server-offline"}`;
-        serverBadgeText.textContent = serverOnline ? "SERVER ONLINE" : "SERVER OFFLINE";
-        serverStatusText.textContent = serverOnline ? "ONLINE" : "OFFLINE";
-        serverMessage.textContent = data.message || "Keine Nachricht";
-        serverUpdatedAt.textContent = updatedAt
-          ? updatedAt.toLocaleString("de-DE", { dateStyle: "medium", timeStyle: "medium" })
-          : "Noch nie";
-        footerText.textContent = `Letzte Prüfung: ${new Date().toLocaleString("de-DE")}`;
+let updated=data.updatedAt?new Date(data.updatedAt):null;
+let tooOld=!updated||(Date.now()-updated.getTime()>OFFLINE_AFTER);
 
-        renderBots(serverOnline);
-      } catch (err) {
-        document.getElementById("serverBadge").className = "server-badge server-offline";
-        document.getElementById("serverBadgeText").textContent = "SERVER OFFLINE";
-        document.getElementById("serverStatusText").textContent = "OFFLINE";
-        document.getElementById("serverMessage").textContent = "Fehler beim Laden";
-        document.getElementById("serverUpdatedAt").textContent = "—";
-        document.getElementById("footerText").textContent = err.message;
+let serverOnline=data.online&&!tooOld;
 
-        renderBots(false);
-      }
-    }
+let serverText=document.getElementById("serverStatus");
 
-    loadStatus();
-    setInterval(loadStatus, 30000);
-  </script>
+if(serverOnline){
+serverText.className="serverStatus serverOnline";
+serverText.textContent="SERVER ONLINE";
+}else{
+serverText.className="serverStatus serverOffline";
+serverText.textContent="SERVER OFFLINE";
+}
+
+renderBots(serverOnline);
+
+}catch{
+
+document.getElementById("serverStatus").textContent="SERVER OFFLINE";
+renderBots(false);
+
+}
+
+}
+
+loadStatus();
+setInterval(loadStatus,30000);
+
+</script>
+
 </body>
 </html>
