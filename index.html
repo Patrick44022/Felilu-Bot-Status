@@ -1,257 +1,873 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Felilu Bot Status</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Felilu Bot Status</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg-1: #0b1020;
+      --bg-2: #111827;
+      --card: rgba(17, 24, 39, 0.88);
+      --border: rgba(255, 255, 255, 0.08);
+      --text: #f3f4f6;
+      --muted: #9ca3af;
+      --online: #22c55e;
+      --offline: #ef4444;
+      --maintenance: #f59e0b;
+      --shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+      --discord-blurple: #5865f2;
+    }
 
-<style>
+    * {
+      box-sizing: border-box;
+    }
 
-body{
-    margin:0;
-    font-family:Arial,Helvetica,sans-serif;
-    background:#0f172a;
-    color:white;
-}
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, #1d4ed8 0%, transparent 28%),
+        radial-gradient(circle at top right, #7c3aed 0%, transparent 25%),
+        linear-gradient(135deg, var(--bg-1), var(--bg-2));
+      padding: 32px 20px 60px;
+    }
 
-.container{
-    max-width:1200px;
-    margin:auto;
-    padding:40px 20px;
-}
+    .container {
+      max-width: 1300px;
+      margin: 0 auto;
+    }
 
-.serverStatus{
-    text-align:center;
-    font-size:40px;
-    font-weight:bold;
-    margin-bottom:40px;
-}
+    .discord-header {
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      flex-wrap: wrap;
+      padding: 20px 24px;
+      margin-bottom: 22px;
+      border-radius: 24px;
+      background: rgba(15, 23, 42, 0.72);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(16px);
+    }
 
-.serverOnline{
-    color:#22c55e;
-    text-shadow:0 0 20px #22c55e;
-}
+    .discord-header::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(90deg, rgba(88, 101, 242, 0.14), transparent 38%, rgba(124, 58, 237, 0.12));
+      pointer-events: none;
+    }
 
-.serverOffline{
-    color:#ef4444;
-    text-shadow:0 0 20px #ef4444;
-}
+    .discord-header-left {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      min-width: 0;
+    }
 
-.botGrid{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
-    gap:25px;
-}
+    .guild-icon {
+      width: 72px;
+      height: 72px;
+      border-radius: 22px;
+      object-fit: cover;
+      border: 2px solid rgba(255, 255, 255, 0.12);
+      background: #111827;
+      box-shadow: 0 0 24px rgba(88, 101, 242, 0.22);
+      flex: 0 0 auto;
+    }
 
-.botCard{
-    background:#111827;
-    border-radius:20px;
-    padding:20px;
-    position:relative;
-    transition:0.3s;
-}
+    .guild-meta {
+      min-width: 0;
+    }
 
-.botCard:hover{
-    transform:translateY(-5px);
-}
+    .guild-title-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 6px;
+    }
 
-.botTop{
-    display:flex;
-    align-items:center;
-    gap:15px;
-}
+    .guild-title {
+      margin: 0;
+      font-size: clamp(1.35rem, 2.8vw, 2rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
 
-.avatar{
-    width:60px;
-    height:60px;
-    border-radius:50%;
-    position:relative;
-}
+    .guild-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 800;
+      color: #c7d2fe;
+      background: rgba(88, 101, 242, 0.16);
+      border: 1px solid rgba(88, 101, 242, 0.24);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
 
-.avatar img{
-    width:60px;
-    height:60px;
-    border-radius:50%;
-}
+    .guild-desc {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.98rem;
+      line-height: 1.5;
+    }
 
-.statusDot{
-    width:14px;
-    height:14px;
-    border-radius:50%;
-    position:absolute;
-    bottom:0;
-    right:0;
-    border:3px solid #111827;
-}
+    .discord-header-right {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
 
-.online{
-    background:#22c55e;
-    box-shadow:0 0 12px #22c55e;
-}
+    .mini-stat {
+      min-width: 150px;
+      padding: 12px 14px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border);
+    }
 
-.offline{
-    background:#ef4444;
-    box-shadow:0 0 12px #ef4444;
-}
+    .mini-stat-label {
+      color: var(--muted);
+      font-size: 0.8rem;
+      margin-bottom: 6px;
+    }
 
-.maintenance{
-    background:#f59e0b;
-    box-shadow:0 0 12px #f59e0b;
-}
+    .mini-stat-value {
+      font-size: 1rem;
+      font-weight: 800;
+    }
 
-.botName{
-    font-weight:bold;
-    font-size:18px;
-}
+    .hero {
+      position: relative;
+      overflow: hidden;
+      background: rgba(15, 23, 42, 0.72);
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      padding: 32px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(16px);
+      margin-bottom: 28px;
+    }
 
-.botTag{
-    color:#9ca3af;
-    font-size:14px;
-}
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(90deg, rgba(34, 197, 94, 0.08), transparent 40%, rgba(124, 58, 237, 0.08));
+      pointer-events: none;
+    }
 
-.botBadge{
-    margin-top:12px;
-    display:inline-block;
-    padding:6px 12px;
-    border-radius:999px;
-    font-size:13px;
-    font-weight:bold;
-}
+    .hero-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      position: relative;
+      z-index: 1;
+    }
 
-.badgeOnline{
-    background:#14532d;
-    color:#4ade80;
-}
+    .title {
+      margin: 0;
+      font-size: clamp(2rem, 4vw, 3.4rem);
+      line-height: 1;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
 
-.badgeOffline{
-    background:#7f1d1d;
-    color:#f87171;
-}
+    .subtitle {
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: 1rem;
+    }
 
-.badgeMaintenance{
-    background:#78350f;
-    color:#fbbf24;
-}
+    .server-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 20px;
+      border-radius: 999px;
+      font-weight: 800;
+      font-size: 1rem;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.04);
+      white-space: nowrap;
+      position: relative;
+      z-index: 1;
+    }
 
-</style>
+    .status-dot {
+      width: 13px;
+      height: 13px;
+      border-radius: 50%;
+      flex: 0 0 auto;
+      position: relative;
+    }
+
+    .server-online .status-dot {
+      background: var(--online);
+      box-shadow: 0 0 18px rgba(34, 197, 94, 0.9);
+    }
+
+    .server-offline .status-dot {
+      background: var(--offline);
+      box-shadow: 0 0 18px rgba(239, 68, 68, 0.9);
+    }
+
+    .status-dot.pulse::after {
+      content: "";
+      position: absolute;
+      inset: -5px;
+      border-radius: 50%;
+      opacity: 0.7;
+      animation: discordPulse 1.8s ease-out infinite;
+    }
+
+    .server-online .status-dot.pulse::after {
+      border: 2px solid rgba(34, 197, 94, 0.45);
+    }
+
+    .server-offline .status-dot.pulse::after {
+      border: 2px solid rgba(239, 68, 68, 0.35);
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 16px;
+      margin-top: 26px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .stat-card {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 18px;
+    }
+
+    .stat-label {
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-bottom: 8px;
+    }
+
+    .stat-value {
+      font-size: 1.1rem;
+      font-weight: 700;
+      word-break: break-word;
+    }
+
+    .section-title {
+      margin: 34px 0 18px;
+      font-size: 1.4rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .bot-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 18px;
+    }
+
+    .bot-card {
+      position: relative;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 18px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(12px);
+      transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+      overflow: hidden;
+    }
+
+    .bot-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(255,255,255,0.04), transparent 30%);
+      pointer-events: none;
+    }
+
+    .bot-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(255, 255, 255, 0.16);
+    }
+
+    .bot-card.online-glow {
+      box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.35),
+        0 0 28px rgba(34, 197, 94, 0.18);
+      border-color: rgba(34, 197, 94, 0.28);
+    }
+
+    .bot-card.offline-glow {
+      box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.35),
+        0 0 28px rgba(239, 68, 68, 0.16);
+      border-color: rgba(239, 68, 68, 0.24);
+    }
+
+    .bot-card.maintenance-glow {
+      box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.35),
+        0 0 28px rgba(245, 158, 11, 0.16);
+      border-color: rgba(245, 158, 11, 0.28);
+    }
+
+    .bot-top {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .bot-avatar-wrap {
+      position: relative;
+      width: 62px;
+      height: 62px;
+      flex: 0 0 auto;
+    }
+
+    .bot-avatar {
+      width: 62px;
+      height: 62px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid rgba(255, 255, 255, 0.12);
+      background: #0f172a;
+      display: block;
+    }
+
+    .bot-presence {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      border: 3px solid #111827;
+    }
+
+    .presence-online {
+      background: var(--online);
+      box-shadow: 0 0 12px rgba(34, 197, 94, 0.9);
+    }
+
+    .presence-offline {
+      background: var(--offline);
+      box-shadow: 0 0 12px rgba(239, 68, 68, 0.9);
+    }
+
+    .presence-maintenance {
+      background: var(--maintenance);
+      box-shadow: 0 0 12px rgba(245, 158, 11, 0.95);
+    }
+
+    .presence-online::after,
+    .presence-maintenance::after {
+      content: "";
+      position: absolute;
+      inset: -4px;
+      border-radius: 50%;
+      animation: discordPulse 1.8s ease-out infinite;
+    }
+
+    .presence-online::after {
+      border: 2px solid rgba(34, 197, 94, 0.35);
+    }
+
+    .presence-maintenance::after {
+      border: 2px solid rgba(245, 158, 11, 0.35);
+    }
+
+    .bot-name {
+      font-size: 1.08rem;
+      font-weight: 800;
+      margin: 0;
+    }
+
+    .bot-tag {
+      color: var(--muted);
+      font-size: 0.92rem;
+      margin-top: 4px;
+    }
+
+    .bot-status-row {
+      margin-top: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      position: relative;
+      z-index: 1;
+    }
+
+    .bot-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      font-size: 0.92rem;
+      font-weight: 700;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .bot-status-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      position: relative;
+    }
+
+    .bot-status-dot.online {
+      background: var(--online);
+      box-shadow: 0 0 10px rgba(34, 197, 94, 0.9);
+    }
+
+    .bot-status-dot.offline {
+      background: var(--offline);
+      box-shadow: 0 0 10px rgba(239, 68, 68, 0.9);
+    }
+
+    .bot-status-dot.maintenance {
+      background: var(--maintenance);
+      box-shadow: 0 0 10px rgba(245, 158, 11, 0.9);
+    }
+
+    .bot-status-dot.online::after,
+    .bot-status-dot.maintenance::after {
+      content: "";
+      position: absolute;
+      inset: -5px;
+      border-radius: 50%;
+      animation: discordPulse 1.8s ease-out infinite;
+    }
+
+    .bot-status-dot.online::after {
+      border: 2px solid rgba(34, 197, 94, 0.32);
+    }
+
+    .bot-status-dot.maintenance::after {
+      border: 2px solid rgba(245, 158, 11, 0.32);
+    }
+
+    .bot-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 7px 12px;
+      border-radius: 999px;
+      font-size: 0.76rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      border: 1px solid transparent;
+    }
+
+    .badge-online {
+      background: rgba(20, 83, 45, 0.55);
+      color: #86efac;
+      border-color: rgba(34, 197, 94, 0.22);
+    }
+
+    .badge-offline {
+      background: rgba(127, 29, 29, 0.52);
+      color: #fca5a5;
+      border-color: rgba(239, 68, 68, 0.24);
+    }
+
+    .badge-maintenance {
+      background: rgba(120, 53, 15, 0.52);
+      color: #fcd34d;
+      border-color: rgba(245, 158, 11, 0.28);
+      box-shadow: 0 0 18px rgba(245, 158, 11, 0.08);
+    }
+
+    .bot-desc {
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 0.94rem;
+      line-height: 1.5;
+      min-height: 42px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .footer {
+      margin-top: 28px;
+      color: var(--muted);
+      font-size: 0.92rem;
+      text-align: center;
+    }
+
+    @keyframes discordPulse {
+      0% {
+        transform: scale(0.95);
+        opacity: 0.8;
+      }
+      70% {
+        transform: scale(1.8);
+        opacity: 0;
+      }
+      100% {
+        transform: scale(1.8);
+        opacity: 0;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .discord-header-right {
+        width: 100%;
+      }
+
+      .mini-stat {
+        flex: 1 1 150px;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .stats {
+        grid-template-columns: 1fr;
+      }
+
+      .hero,
+      .discord-header {
+        padding: 22px;
+      }
+
+      .guild-icon {
+        width: 62px;
+        height: 62px;
+        border-radius: 18px;
+      }
+    }
+  </style>
 </head>
-
 <body>
+  <div class="container">
 
-<div class="container">
+    <section class="discord-header">
+      <div class="discord-header-left">
+        <img
+          class="guild-icon"
+          id="guildIcon"
+          src="https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=300&q=80"
+          alt="Server Icon"
+        />
 
-<div id="serverStatus" class="serverStatus">Server wird geladen...</div>
+        <div class="guild-meta">
+          <div class="guild-title-row">
+            <h1 class="guild-title">Felilu Community</h1>
+            <span class="guild-badge">Discord Status</span>
+          </div>
+          <p class="guild-desc">
+            Übersicht über Systemstatus, Discord-Bots und Wartungszustände.
+          </p>
+        </div>
+      </div>
 
-<div id="botGrid" class="botGrid"></div>
+      <div class="discord-header-right">
+        <div class="mini-stat">
+          <div class="mini-stat-label">Community</div>
+          <div class="mini-stat-value">10 Bots verbunden</div>
+        </div>
+        <div class="mini-stat">
+          <div class="mini-stat-label">System</div>
+          <div class="mini-stat-value">Live Monitoring aktiv</div>
+        </div>
+      </div>
+    </section>
 
-</div>
+    <section class="hero">
+      <div class="hero-top">
+        <div>
+          <h2 class="title">Felilu Netzwerk Status</h2>
+          <p class="subtitle">Live-Übersicht über Server und Discord-Bots</p>
+        </div>
 
-<script>
+        <div id="serverBadge" class="server-badge server-offline">
+          <span class="status-dot pulse"></span>
+          <span id="serverBadgeText">SERVER WIRD GELADEN ...</span>
+        </div>
+      </div>
 
-const STATUS_URL="./status.json";
-const OFFLINE_AFTER=3*60*1000;
+      <div class="stats">
+        <div class="stat-card">
+          <div class="stat-label">Server Status</div>
+          <div id="serverStatusText" class="stat-value">Lade ...</div>
+        </div>
 
-const bots=[
-{name:"Felilu Guard",tag:"#1001",status:"online",avatar:"https://cdn.discordapp.com/embed/avatars/0.png"},
-{name:"Felilu Music",tag:"#1002",status:"online",avatar:"https://cdn.discordapp.com/embed/avatars/1.png"},
-{name:"Felilu Tickets",tag:"#1003",status:"maintenance",avatar:"https://cdn.discordapp.com/embed/avatars/2.png"},
-{name:"Felilu Logs",tag:"#1004",status:"online",avatar:"https://cdn.discordapp.com/embed/avatars/3.png"},
-{name:"Felilu Verify",tag:"#1005",status:"online",avatar:"https://cdn.discordapp.com/embed/avatars/4.png"},
-{name:"Felilu AI",tag:"#1006",status:"offline",avatar:"https://cdn.discordapp.com/embed/avatars/5.png"},
-{name:"Felilu Stats",tag:"#1007",status:"online",avatar:"https://cdn.discordapp.com/embed/avatars/0.png"},
-{name:"Felilu Welcome",tag:"#1008",status:"maintenance",avatar:"https://cdn.discordapp.com/embed/avatars/1.png"},
-{name:"Felilu Backup",tag:"#1009",status:"online",avatar:"https://cdn.discordapp.com/embed/avatars/2.png"},
-{name:"Felilu Notify",tag:"#1010",status:"online",avatar:"https://cdn.discordapp.com/embed/avatars/3.png"}
-];
+        <div class="stat-card">
+          <div class="stat-label">Nachricht</div>
+          <div id="serverMessage" class="stat-value">—</div>
+        </div>
 
-function renderBots(serverOnline){
+        <div class="stat-card">
+          <div class="stat-label">Letztes Signal</div>
+          <div id="serverUpdatedAt" class="stat-value">—</div>
+        </div>
 
-const grid=document.getElementById("botGrid");
-grid.innerHTML="";
+        <div class="stat-card">
+          <div class="stat-label">Bots online</div>
+          <div id="botCounter" class="stat-value">0 / 10</div>
+        </div>
+      </div>
+    </section>
 
-bots.forEach(bot=>{
+    <h2 class="section-title">Discord Bots</h2>
+    <section id="botGrid" class="bot-grid"></section>
 
-let status=serverOnline?bot.status:"offline";
+    <div id="footerText" class="footer">Aktualisiere Status ...</div>
+  </div>
 
-let badge="badgeOnline";
-let dot="online";
-let label="ONLINE";
+  <script>
+    const STATUS_URL = "./status.json";
+    const OFFLINE_AFTER_MS = 3 * 60 * 1000;
 
-if(status==="offline"){
-badge="badgeOffline";
-dot="offline";
-label="OFFLINE";
-}
+    // Discord Header anpassbar
+    const serverHeader = {
+      name: "Felilu Community",
+      description: "Übersicht über Systemstatus, Discord-Bots und Wartungszustände.",
+      icon: "https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=300&q=80",
+      badge: "Discord Status",
+      miniLeft: "10 Bots verbunden",
+      miniRight: "Live Monitoring aktiv"
+    };
 
-if(status==="maintenance"){
-badge="badgeMaintenance";
-dot="maintenance";
-label="WARTUNG";
-}
+    // Hier Bots bearbeiten:
+    // status: "online", "offline", "maintenance"
+    // avatar: direkte Bild-URL
+    const bots = [
+      {
+        name: "Felilu Guard",
+        tag: "@felilu-guard",
+        status: "online",
+        description: "Schützt den Server und kümmert sich um Moderation.",
+        avatar: "https://cdn.discordapp.com/embed/avatars/0.png"
+      },
+      {
+        name: "Felilu Music",
+        tag: "@felilu-music",
+        status: "online",
+        description: "Spielt Musik, verwaltet Warteschlangen und Commands.",
+        avatar: "https://cdn.discordapp.com/embed/avatars/1.png"
+      },
+      {
+        name: "Felilu Tickets",
+        tag: "@felilu-tickets",
+        status: "maintenance",
+        description: "Bearbeitet Support-Tickets und private Anfragen.",
+        avatar: "https://cdn.discordapp.com/embed/avatars/2.png"
+      },
+      {
+        name: "Felilu Logs",
+        tag: "@felilu-logs",
+        status: "online",
+        description: "Speichert Audit-Logs und Statusmeldungen.",
+        avatar: "https://cdn.discordapp.com/embed/avatars/3.png"
+      },
+      {
+        name: "Felilu Verify",
+        tag: "@felilu-verify",
+        status: "online",
+        description: "Übernimmt Verifizierung und Rollenzuweisung.",
+        avatar: "https://cdn.discordapp.com/embed/avatars/4.png"
+      },
+      {
+        name: "Felilu AI",
+        tag: "@felilu-ai",
+        status: "offline",
+        description: "Antwortet auf Fragen und hilft im Community-Chat.",
+        avatar: "https://cdn.discordapp.com/embed/avatars/5.png"
+      },
+      {
+        name: "Felilu Stats",
+        tag: "@felilu-stats",
+        status: "online",
+        description: "Erstellt Statistiken und Aktivitätsübersichten.",
+        avatar: "https://cdn.discordapp.com/embed/avatars/0.png"
+      },
+      {
+        name: "Felilu Welcome",
+        tag: "@felilu-welcome",
+        status: "maintenance",
+        description: "Begrüßt neue Mitglieder und verschickt Hinweise.",
+        avatar: "https://cdn.discordapp.com/embed/avatars/1.png"
+      },
+      {
+        name: "Felilu Backup",
+        tag: "@felilu-backup",
+        status: "online",
+        description: "Verwaltet Sicherungen und automatische Tasks.",
+        avatar: "https://cdn.discordapp.com/embed/avatars/2.png"
+      },
+      {
+        name: "Felilu Notify",
+        tag: "@felilu-notify",
+        status: "online",
+        description: "Schickt News, Alerts und System-Benachrichtigungen.",
+        avatar: "https://cdn.discordapp.com/embed/avatars/3.png"
+      }
+    ];
 
-grid.innerHTML+=`
-<div class="botCard">
+    function applyHeader() {
+      document.querySelector(".guild-title").textContent = serverHeader.name;
+      document.querySelector(".guild-desc").textContent = serverHeader.description;
+      document.querySelector(".guild-badge").textContent = serverHeader.badge;
+      document.getElementById("guildIcon").src = serverHeader.icon;
+      document.querySelectorAll(".mini-stat-value")[0].textContent = serverHeader.miniLeft;
+      document.querySelectorAll(".mini-stat-value")[1].textContent = serverHeader.miniRight;
+    }
 
-<div class="botTop">
+    function getStatusMeta(status) {
+      if (status === "online") {
+        return {
+          label: "Online",
+          badgeLabel: "ONLINE",
+          presenceClass: "presence-online",
+          glowClass: "online-glow",
+          badgeClass: "badge-online",
+          dotClass: "online"
+        };
+      }
 
-<div class="avatar">
-<img src="${bot.avatar}">
-<div class="statusDot ${dot}"></div>
-</div>
+      if (status === "maintenance") {
+        return {
+          label: "Wartungsarbeiten",
+          badgeLabel: "WARTUNG",
+          presenceClass: "presence-maintenance",
+          glowClass: "maintenance-glow",
+          badgeClass: "badge-maintenance",
+          dotClass: "maintenance"
+        };
+      }
 
-<div>
-<div class="botName">${bot.name}</div>
-<div class="botTag">${bot.tag}</div>
-</div>
+      return {
+        label: "Offline",
+        badgeLabel: "OFFLINE",
+        presenceClass: "presence-offline",
+        glowClass: "offline-glow",
+        badgeClass: "badge-offline",
+        dotClass: "offline"
+      };
+    }
 
-</div>
+    function renderBots(serverOnline) {
+      const botGrid = document.getElementById("botGrid");
+      botGrid.innerHTML = "";
 
-<div class="botBadge ${badge}">${label}</div>
+      let onlineCount = 0;
 
-</div>
-`;
+      bots.forEach((bot) => {
+        const effectiveStatus = serverOnline ? bot.status : "offline";
+        if (effectiveStatus === "online") onlineCount++;
 
-});
+        const meta = getStatusMeta(effectiveStatus);
 
-}
+        const card = document.createElement("article");
+        card.className = `bot-card ${meta.glowClass}`;
 
-async function loadStatus(){
+        card.innerHTML = `
+          <div class="bot-top">
+            <div class="bot-avatar-wrap">
+              <img class="bot-avatar" src="${bot.avatar}" alt="${bot.name}" onerror="this.src='https://cdn.discordapp.com/embed/avatars/0.png'">
+              <span class="bot-presence ${meta.presenceClass}"></span>
+            </div>
+            <div>
+              <h3 class="bot-name">${bot.name}</h3>
+              <div class="bot-tag">${bot.tag}</div>
+            </div>
+          </div>
 
-try{
+          <div class="bot-status-row">
+            <div class="bot-status">
+              <span class="bot-status-dot ${meta.dotClass}"></span>
+              <span>${meta.label}</span>
+            </div>
+            <span class="bot-badge ${meta.badgeClass}">${meta.badgeLabel}</span>
+          </div>
 
-const res=await fetch(STATUS_URL+"?"+Date.now());
-const data=await res.json();
+          <div class="bot-desc">${bot.description}</div>
+        `;
 
-let updated=data.updatedAt?new Date(data.updatedAt):null;
-let tooOld=!updated||(Date.now()-updated.getTime()>OFFLINE_AFTER);
+        botGrid.appendChild(card);
+      });
 
-let serverOnline=data.online&&!tooOld;
+      document.getElementById("botCounter").textContent = `${onlineCount} / ${bots.length}`;
+    }
 
-let serverText=document.getElementById("serverStatus");
+    async function loadStatus() {
+      try {
+        const res = await fetch(STATUS_URL + "?t=" + Date.now(), { cache: "no-store" });
+        if (!res.ok) throw new Error("status.json konnte nicht geladen werden");
 
-if(serverOnline){
-serverText.className="serverStatus serverOnline";
-serverText.textContent="SERVER ONLINE";
-}else{
-serverText.className="serverStatus serverOffline";
-serverText.textContent="SERVER OFFLINE";
-}
+        const data = await res.json();
 
-renderBots(serverOnline);
+        const updatedAt = data.updatedAt ? new Date(data.updatedAt) : null;
+        const tooOld = !updatedAt || (Date.now() - updatedAt.getTime() > OFFLINE_AFTER_MS);
+        const serverOnline = Boolean(data.online) && !tooOld;
 
-}catch{
+        const serverBadge = document.getElementById("serverBadge");
+        const serverBadgeText = document.getElementById("serverBadgeText");
+        const serverStatusText = document.getElementById("serverStatusText");
+        const serverMessage = document.getElementById("serverMessage");
+        const serverUpdatedAt = document.getElementById("serverUpdatedAt");
+        const footerText = document.getElementById("footerText");
 
-document.getElementById("serverStatus").textContent="SERVER OFFLINE";
-renderBots(false);
+        serverBadge.className = `server-badge ${serverOnline ? "server-online" : "server-offline"}`;
+        serverBadgeText.textContent = serverOnline ? "SERVER ONLINE" : "SERVER OFFLINE";
+        serverStatusText.textContent = serverOnline ? "ONLINE" : "OFFLINE";
+        serverMessage.textContent = data.message || "Keine Nachricht";
+        serverUpdatedAt.textContent = updatedAt
+          ? updatedAt.toLocaleString("de-DE", { dateStyle: "medium", timeStyle: "medium" })
+          : "Noch nie";
+        footerText.textContent = `Letzte Prüfung: ${new Date().toLocaleString("de-DE")}`;
 
-}
+        renderBots(serverOnline);
+      } catch (err) {
+        document.getElementById("serverBadge").className = "server-badge server-offline";
+        document.getElementById("serverBadgeText").textContent = "SERVER OFFLINE";
+        document.getElementById("serverStatusText").textContent = "OFFLINE";
+        document.getElementById("serverMessage").textContent = "Fehler beim Laden";
+        document.getElementById("serverUpdatedAt").textContent = "—";
+        document.getElementById("footerText").textContent = err.message;
 
-}
+        renderBots(false);
+      }
+    }
 
-loadStatus();
-setInterval(loadStatus,30000);
-
-</script>
-
+    applyHeader();
+    loadStatus();
+    setInterval(loadStatus, 30000);
+  </script>
 </body>
 </html>
