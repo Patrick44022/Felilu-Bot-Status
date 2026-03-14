@@ -311,7 +311,7 @@
 
     .stats {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 16px;
       margin-top: 26px;
       position: relative;
@@ -660,11 +660,6 @@
         </div>
 
         <div class="stat-card">
-          <div class="stat-label">Uptime</div>
-          <div id="serverUptime" class="stat-value">—</div>
-        </div>
-
-        <div class="stat-card">
           <div class="stat-label">Bots online</div>
           <div id="botCounter" class="stat-value">0 / 10</div>
         </div>
@@ -762,9 +757,6 @@
       }
     ];
 
-    let onlineSince = null;
-    let currentServerOnline = false;
-
     function applyHeader() {
       document.querySelector(".guild-title").textContent = serverHeader.name;
       document.querySelector(".guild-desc").textContent = serverHeader.description;
@@ -785,7 +777,7 @@
 
       if (status === "maintenance") {
         return {
-          label: "Wartungsarbeiten",
+          label: "Wartung",
           presenceClass: "presence-maintenance",
           glowClass: "maintenance-glow",
           dotClass: "maintenance"
@@ -800,29 +792,6 @@
       };
     }
 
-    function formatDuration(ms) {
-      if (!ms || ms < 0) return "Gerade eben";
-
-      const totalSeconds = Math.floor(ms / 1000);
-      const days = Math.floor(totalSeconds / 86400);
-      const hours = Math.floor((totalSeconds % 86400) / 3600);
-      const minutes = Math.floor((totalSeconds % 3600) / 60);
-
-      if (days > 0) {
-        return `${days} Tag${days !== 1 ? "e" : ""} ${hours} Std`;
-      }
-
-      if (hours > 0) {
-        return `${hours} Std ${minutes} Min`;
-      }
-
-      if (minutes > 0) {
-        return `${minutes} Min`;
-      }
-
-      return "Unter 1 Minute";
-    }
-
     function updateTheme(serverOnline) {
       const header = document.getElementById("discordHeader");
       const hero = document.getElementById("heroSection");
@@ -835,17 +804,6 @@
       hero.classList.toggle("server-offline-theme", !serverOnline);
 
       systemState.textContent = serverOnline ? "Server stabil online" : "Server aktuell offline";
-    }
-
-    function updateUptimeDisplay() {
-      const uptimeEl = document.getElementById("serverUptime");
-
-      if (!currentServerOnline || !onlineSince) {
-        uptimeEl.textContent = "Offline";
-        return;
-      }
-
-      uptimeEl.textContent = formatDuration(Date.now() - onlineSince);
     }
 
     function renderBots(serverOnline) {
@@ -902,16 +860,6 @@
         const tooOld = !updatedAt || (Date.now() - updatedAt.getTime() > OFFLINE_AFTER_MS);
         const serverOnline = Boolean(data.online) && !tooOld;
 
-        if (serverOnline && !currentServerOnline) {
-          onlineSince = Date.now();
-        }
-
-        if (!serverOnline) {
-          onlineSince = null;
-        }
-
-        currentServerOnline = serverOnline;
-
         const serverBadge = document.getElementById("serverBadge");
         const serverBadgeText = document.getElementById("serverBadgeText");
         const serverStatusText = document.getElementById("serverStatusText");
@@ -923,19 +871,14 @@
         serverMessage.textContent = data.message || "Keine Nachricht";
 
         updateTheme(serverOnline);
-        updateUptimeDisplay();
         renderBots(serverOnline);
       } catch (err) {
-        currentServerOnline = false;
-        onlineSince = null;
-
         document.getElementById("serverBadge").className = "server-badge server-offline";
         document.getElementById("serverBadgeText").textContent = "SERVER OFFLINE";
         document.getElementById("serverStatusText").textContent = "OFFLINE";
         document.getElementById("serverMessage").textContent = "Fehler beim Laden";
 
         updateTheme(false);
-        updateUptimeDisplay();
         renderBots(false);
       }
     }
@@ -943,7 +886,6 @@
     applyHeader();
     loadStatus();
     setInterval(loadStatus, 30000);
-    setInterval(updateUptimeDisplay, 1000);
   </script>
 </body>
 </html>
