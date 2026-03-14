@@ -477,37 +477,6 @@
       border: 2px solid rgba(245, 158, 11, 0.32);
     }
 
-    .bot-badge {
-      display: inline-flex;
-      align-items: center;
-      padding: 7px 12px;
-      border-radius: 999px;
-      font-size: 0.76rem;
-      font-weight: 800;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      border: 1px solid transparent;
-    }
-
-    .badge-online {
-      background: rgba(20, 83, 45, 0.55);
-      color: #86efac;
-      border-color: rgba(34, 197, 94, 0.22);
-    }
-
-    .badge-offline {
-      background: rgba(127, 29, 29, 0.52);
-      color: #fca5a5;
-      border-color: rgba(239, 68, 68, 0.24);
-    }
-
-    .badge-maintenance {
-      background: rgba(120, 53, 15, 0.52);
-      color: #fcd34d;
-      border-color: rgba(245, 158, 11, 0.28);
-      box-shadow: 0 0 18px rgba(245, 158, 11, 0.08);
-    }
-
     .bot-desc {
       margin-top: 14px;
       color: var(--muted);
@@ -653,7 +622,6 @@
     const STATUS_URL = "./status.json";
     const OFFLINE_AFTER_MS = 3 * 60 * 1000;
 
-    // Discord Header anpassbar
     const serverHeader = {
       name: "Felilu Community",
       description: "Übersicht über Systemstatus, Discord-Bots und Wartungszustände.",
@@ -663,9 +631,6 @@
       miniRight: "Live Monitoring aktiv"
     };
 
-    // Hier Bots bearbeiten:
-    // status: "online", "offline", "maintenance"
-    // avatar: direkte Bild-URL
     const bots = [
       {
         name: "Felilu Guard",
@@ -752,10 +717,8 @@
       if (status === "online") {
         return {
           label: "Online",
-          badgeLabel: "ONLINE",
           presenceClass: "presence-online",
           glowClass: "online-glow",
-          badgeClass: "badge-online",
           dotClass: "online"
         };
       }
@@ -763,20 +726,16 @@
       if (status === "maintenance") {
         return {
           label: "Wartungsarbeiten",
-          badgeLabel: "WARTUNG",
           presenceClass: "presence-maintenance",
           glowClass: "maintenance-glow",
-          badgeClass: "badge-maintenance",
           dotClass: "maintenance"
         };
       }
 
       return {
         label: "Offline",
-        badgeLabel: "OFFLINE",
         presenceClass: "presence-offline",
         glowClass: "offline-glow",
-        badgeClass: "badge-offline",
         dotClass: "offline"
       };
     }
@@ -813,7 +772,6 @@
               <span class="bot-status-dot ${meta.dotClass}"></span>
               <span>${meta.label}</span>
             </div>
-            <span class="bot-badge ${meta.badgeClass}">${meta.badgeLabel}</span>
           </div>
 
           <div class="bot-desc">${bot.description}</div>
