@@ -1,6 +1,6 @@
 {
-  "online": false,
-  "updatedAt": null,
-  "message": "Noch kein Server-Update erhalten",
+  "online": true,
+  "updatedAt": "2026-03-14T22:35:13.619Z",
+  "message": "Server läuft",
   "serverName": "Mein Server"
 }
