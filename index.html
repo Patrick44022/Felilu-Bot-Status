@@ -56,7 +56,11 @@
       border: 1px solid var(--border);
       box-shadow: var(--shadow);
       backdrop-filter: blur(16px);
-      transition: border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+      transition:
+        border-color 0.3s ease,
+        box-shadow 0.3s ease,
+        background 0.3s ease,
+        transform 0.2s ease;
     }
 
     .discord-header::before {
@@ -66,7 +70,7 @@
       background:
         linear-gradient(90deg, rgba(88, 101, 242, 0.14), transparent 38%, rgba(124, 58, 237, 0.12));
       pointer-events: none;
-      transition: opacity 0.25s ease;
+      transition: opacity 0.3s ease;
     }
 
     .discord-header.is-online {
@@ -117,6 +121,15 @@
       background: #111827;
       box-shadow: 0 0 24px rgba(88, 101, 242, 0.22);
       flex: 0 0 auto;
+      transition:
+        transform 0.25s ease,
+        box-shadow 0.25s ease,
+        border-color 0.25s ease;
+    }
+
+    .discord-header:hover .guild-icon {
+      transform: scale(1.03);
+      box-shadow: 0 0 28px rgba(88, 101, 242, 0.28);
     }
 
     .guild-meta {
@@ -136,6 +149,7 @@
       font-size: clamp(1.35rem, 2.8vw, 2rem);
       font-weight: 800;
       letter-spacing: -0.03em;
+      transition: color 0.25s ease;
     }
 
     .guild-badge {
@@ -151,6 +165,10 @@
       border: 1px solid rgba(88, 101, 242, 0.24);
       text-transform: uppercase;
       letter-spacing: 0.05em;
+      transition:
+        background 0.25s ease,
+        border-color 0.25s ease,
+        color 0.25s ease;
     }
 
     .guild-desc {
@@ -158,6 +176,7 @@
       color: var(--muted);
       font-size: 0.98rem;
       line-height: 1.5;
+      transition: color 0.25s ease;
     }
 
     .discord-header-right {
@@ -174,17 +193,28 @@
       border-radius: 18px;
       background: rgba(255, 255, 255, 0.04);
       border: 1px solid var(--border);
+      transition:
+        transform 0.2s ease,
+        border-color 0.25s ease,
+        background 0.25s ease;
+    }
+
+    .mini-stat:hover {
+      transform: translateY(-2px);
+      border-color: rgba(255, 255, 255, 0.14);
     }
 
     .mini-stat-label {
       color: var(--muted);
       font-size: 0.8rem;
       margin-bottom: 6px;
+      transition: color 0.25s ease;
     }
 
     .mini-stat-value {
       font-size: 1rem;
       font-weight: 800;
+      transition: color 0.25s ease;
     }
 
     .hero {
@@ -197,7 +227,10 @@
       box-shadow: var(--shadow);
       backdrop-filter: blur(16px);
       margin-bottom: 28px;
-      transition: border-color 0.25s ease, box-shadow 0.25s ease;
+      transition:
+        border-color 0.3s ease,
+        box-shadow 0.3s ease,
+        transform 0.2s ease;
     }
 
     .hero::before {
@@ -208,7 +241,7 @@
         linear-gradient(90deg, rgba(34, 197, 94, 0.08), transparent 40%, rgba(124, 58, 237, 0.08));
       pointer-events: none;
       opacity: 0.75;
-      transition: opacity 0.25s ease, background 0.25s ease;
+      transition: opacity 0.3s ease, background 0.3s ease;
     }
 
     .hero.server-online-theme {
@@ -251,12 +284,14 @@
       line-height: 1;
       font-weight: 800;
       letter-spacing: -0.03em;
+      transition: color 0.25s ease;
     }
 
     .subtitle {
       margin: 10px 0 0;
       color: var(--muted);
       font-size: 1rem;
+      transition: color 0.25s ease;
     }
 
     .server-badge {
@@ -272,6 +307,16 @@
       white-space: nowrap;
       position: relative;
       z-index: 1;
+      transition:
+        border-color 0.25s ease,
+        background 0.25s ease,
+        color 0.25s ease,
+        transform 0.2s ease,
+        box-shadow 0.25s ease;
+    }
+
+    .server-badge:hover {
+      transform: translateY(-1px);
     }
 
     .status-dot {
@@ -280,6 +325,7 @@
       border-radius: 50%;
       flex: 0 0 auto;
       position: relative;
+      transition: background 0.25s ease, box-shadow 0.25s ease;
     }
 
     .server-online .status-dot {
@@ -323,18 +369,29 @@
       border: 1px solid var(--border);
       border-radius: 20px;
       padding: 18px;
+      transition:
+        transform 0.2s ease,
+        border-color 0.25s ease,
+        background 0.25s ease;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(255, 255, 255, 0.14);
     }
 
     .stat-label {
       color: var(--muted);
       font-size: 0.9rem;
       margin-bottom: 8px;
+      transition: color 0.25s ease;
     }
 
     .stat-value {
       font-size: 1.1rem;
       font-weight: 700;
       word-break: break-word;
+      transition: color 0.25s ease;
     }
 
     .section-title {
@@ -342,6 +399,7 @@
       font-size: 1.4rem;
       font-weight: 800;
       letter-spacing: -0.02em;
+      transition: color 0.25s ease;
     }
 
     .bot-grid {
@@ -358,7 +416,11 @@
       padding: 18px;
       box-shadow: var(--shadow);
       backdrop-filter: blur(12px);
-      transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+      transition:
+        transform 0.22s ease,
+        border-color 0.25s ease,
+        box-shadow 0.25s ease,
+        background 0.25s ease;
       overflow: hidden;
     }
 
@@ -392,8 +454,8 @@
     .bot-card.maintenance-glow {
       box-shadow:
         0 20px 60px rgba(0, 0, 0, 0.35),
-        0 0 28px rgba(245, 158, 11, 0.16);
-      border-color: rgba(245, 158, 11, 0.28);
+        0 0 34px rgba(245, 158, 11, 0.24);
+      border-color: rgba(245, 158, 11, 0.34);
     }
 
     .bot-top {
@@ -419,6 +481,15 @@
       border: 2px solid rgba(255, 255, 255, 0.12);
       background: #0f172a;
       display: block;
+      transition:
+        transform 0.22s ease,
+        border-color 0.25s ease,
+        box-shadow 0.25s ease;
+    }
+
+    .bot-card:hover .bot-avatar {
+      transform: scale(1.04);
+      border-color: rgba(255, 255, 255, 0.18);
     }
 
     .bot-presence {
@@ -429,6 +500,7 @@
       height: 16px;
       border-radius: 50%;
       border: 3px solid #111827;
+      transition: background 0.25s ease, box-shadow 0.25s ease;
     }
 
     .presence-online {
@@ -443,7 +515,7 @@
 
     .presence-maintenance {
       background: var(--maintenance);
-      box-shadow: 0 0 12px rgba(245, 158, 11, 0.95);
+      box-shadow: 0 0 14px rgba(245, 158, 11, 1);
     }
 
     .presence-online::after,
@@ -460,19 +532,21 @@
     }
 
     .presence-maintenance::after {
-      border: 2px solid rgba(245, 158, 11, 0.35);
+      border: 2px solid rgba(245, 158, 11, 0.45);
     }
 
     .bot-name {
       font-size: 1.08rem;
       font-weight: 800;
       margin: 0;
+      transition: color 0.25s ease;
     }
 
     .bot-tag {
       color: var(--muted);
       font-size: 0.92rem;
       margin-top: 4px;
+      transition: color 0.25s ease;
     }
 
     .bot-status-row {
@@ -495,6 +569,16 @@
       font-weight: 700;
       border: 1px solid var(--border);
       background: rgba(255, 255, 255, 0.04);
+      transition:
+        border-color 0.25s ease,
+        background 0.25s ease,
+        color 0.25s ease,
+        transform 0.2s ease;
+    }
+
+    .bot-card:hover .bot-status {
+      transform: translateY(-1px);
+      border-color: rgba(255, 255, 255, 0.16);
     }
 
     .bot-status-dot {
@@ -502,6 +586,7 @@
       height: 10px;
       border-radius: 50%;
       position: relative;
+      transition: background 0.25s ease, box-shadow 0.25s ease;
     }
 
     .bot-status-dot.online {
@@ -516,7 +601,7 @@
 
     .bot-status-dot.maintenance {
       background: var(--maintenance);
-      box-shadow: 0 0 10px rgba(245, 158, 11, 0.9);
+      box-shadow: 0 0 12px rgba(245, 158, 11, 1);
     }
 
     .bot-status-dot.online::after,
@@ -533,7 +618,7 @@
     }
 
     .bot-status-dot.maintenance::after {
-      border: 2px solid rgba(245, 158, 11, 0.32);
+      border: 2px solid rgba(245, 158, 11, 0.42);
     }
 
     .bot-desc {
@@ -544,6 +629,16 @@
       min-height: 42px;
       position: relative;
       z-index: 1;
+      transition: color 0.25s ease;
+    }
+
+    .bot-card.maintenance-glow .bot-status {
+      border-color: rgba(245, 158, 11, 0.28);
+      background: rgba(245, 158, 11, 0.08);
+    }
+
+    .bot-card.maintenance-glow .bot-desc {
+      color: #fcd34d;
     }
 
     .footer {
@@ -551,6 +646,7 @@
       color: var(--muted);
       font-size: 0.92rem;
       text-align: center;
+      transition: color 0.25s ease;
     }
 
     @keyframes discordPulse {
@@ -610,6 +706,7 @@
           id="guildIcon"
           src="https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=300&q=80"
           alt="Server Icon"
+          onerror="this.src='https://cdn.discordapp.com/embed/avatars/0.png'"
         />
 
         <div class="guild-meta">
@@ -677,10 +774,10 @@
     const OFFLINE_AFTER_MS = 3 * 60 * 1000;
 
     const serverHeader = {
-      name: "Felilu Community",
+      name: "・୨・𝐅𝐞𝐥𝐢𝐥𝐮・୧・",
       description: "Übersicht über Systemstatus, Discord-Bots und Wartungszustände.",
       icon: "https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=300&q=80",
-      badge: "Discord Status",
+      badge: "Discord Bot Status",
       miniLeft: "10 Bots verbunden"
     };
 
@@ -703,7 +800,7 @@
         name: "Felilu Tickets",
         tag: "@felilu-tickets",
         status: "maintenance",
-        description: "Bearbeitet Support-Tickets und private Anfragen.",
+        description: "Support-System wird gerade überarbeitet.",
         avatar: "https://cdn.discordapp.com/embed/avatars/2.png"
       },
       {
@@ -738,7 +835,7 @@
         name: "Felilu Welcome",
         tag: "@felilu-welcome",
         status: "maintenance",
-        description: "Begrüßt neue Mitglieder und verschickt Hinweise.",
+        description: "Willkommenssystem befindet sich in Wartung.",
         avatar: "https://cdn.discordapp.com/embed/avatars/1.png"
       },
       {
@@ -777,7 +874,7 @@
 
       if (status === "maintenance") {
         return {
-          label: "Wartung",
+          label: "🛠 Wartung",
           presenceClass: "presence-maintenance",
           glowClass: "maintenance-glow",
           dotClass: "maintenance"
@@ -876,7 +973,7 @@
         document.getElementById("serverBadge").className = "server-badge server-offline";
         document.getElementById("serverBadgeText").textContent = "SERVER OFFLINE";
         document.getElementById("serverStatusText").textContent = "OFFLINE";
-        document.getElementById("serverMessage").textContent = "Fehler beim Laden";
+        document.getElementById("serverMessage").textContent = "Status aktuell nicht erreichbar";
 
         updateTheme(false);
         renderBots(false);
